@@ -1,0 +1,12 @@
+============================================
+BASE DE DATOS MIKUY DB
+=========================================
+HOST = "localhost" / IP ADDRESS
+DATABASE_NAME = "mikuydb
+USER_NAME="mikuyadmin"
+USER_PASSWORD="Cud3azzdVFKpJuQx"
+=====================================
+//Server PhpAdmin
+USER_NAME ="root"
+USER_PASSWORD="ua5Ph172SWoDm4kB"
+
