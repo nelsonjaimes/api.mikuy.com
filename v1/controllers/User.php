@@ -1,4 +1,5 @@
 <?php 
+require_once 'data/MysqlManager.php';
 require_once 'utils/Helper.php';
   class User{
   	public static function post($urlSegments) {
@@ -92,7 +93,7 @@ require_once 'utils/Helper.php';
             $preparedStament->bindParam(4, $gender);
             $preparedStament->bindParam(5,$hash);
             $preparedStament->bindParam(6,$token);
-            if ( $preparedStament->execute()) return true;
+            if ($preparedStament->execute()) return true;
             else return false;
         }
 

@@ -5,9 +5,9 @@ require 'utils/ApiException.php';
 require 'controllers/categorias.php';
 require 'controllers/comanda.php';
 require 'controllers/preliquidacion.php';
-require 'controllers/usuarios.php';
 require 'controllers/User.php';
-require 'controllers/platillos.php';
+require 'controllers/Reserve.php';
+require 'controllers/Plates.php';
 require_once 'utils/Helper.php';
 
 $format = isset($_GET['format']) ? $_GET['format'] : 'json';
@@ -33,7 +33,7 @@ if (isset($_GET['PATH_INFO'])) {
 }
 
 $resource = array_shift($urlSegments);
-$apiResources = array(USER,'comanda','preliquidacion','usuarios','platillos');
+$apiResources = array(USER,PLATES,RESERVE);
 
 if (!in_array($resource, $apiResources)) {
     throw $resourceNotFound;
@@ -41,16 +41,20 @@ if (!in_array($resource, $apiResources)) {
 
 $httpMethod = strtolower($_SERVER['REQUEST_METHOD']);
 switch ($httpMethod) {
-    case 'get':  break; 
+    case 'get':  
+              if (!strcmp($resource,PLATES)) {
+                $apiView->render(Plates::get($urlSegments));
+              }
+    break; 
     case 'post':
-               printf($resource);
-               if($resource==USER){
+     print("1-");
+               if(!strcmp($resource,USER)){
                 $apiView->render(User::post($urlSegments));
-                }
+                 }else if(!strcmp($resource,RESERVE)){
+                        print("2-");
+                        $apiView->render(Reserve::post($urlSegments));
+                  }
     break;
-    case 'put': break;
-    case 'delete':break;
-        
     default:
         $methodNotAllowed = new ApiException(
             405,

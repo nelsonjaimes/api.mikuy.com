@@ -1,0 +1,16 @@
+create table tbl_reserve (
+  codereserve varchar(5) PRIMARY key NOT NULL,
+  emailuser varchar,
+  datehour varchar(30),
+  amount float,
+  FOREIGN KEY(emailuser) REFERENCES tbl_user(email) on DELETE CASCADE  
+);
+
+create table tbl_detail_reserve(
+   code_reserve varchar(5) not null, 
+   code_plate varchar(4) not null ,
+   count_plate int not null ,
+   PRIMARY KEY(code_reserve,code_plate),
+   FOREIGN KEY(code_reserve) REFERENCES tbl_reserve(codereserve) on DELETE CASCADE,
+   FOREIGN KEY(code_plate) REFERENCES tbl_plates(code) on DELETE CASCADE
+);

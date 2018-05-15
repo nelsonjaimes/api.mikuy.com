@@ -3,15 +3,8 @@ require_once 'login_mysql.php';
 
 
 class MysqlManager {
-
-    /**
-     * Única instancia de la clase
-     */
+    
     private static $mysqlManager = null;
-
-    /**
-     * Instancia de PDO
-     */
     private static $pdo;
 
     final private function __construct() {
