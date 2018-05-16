@@ -44,11 +44,10 @@ switch ($httpMethod) {
               }
     break; 
     case 'post':
-     print("1-");
                if(!strcmp($resource,USER)){
                 $apiView->render(User::post($urlSegments));
                  }else if(!strcmp($resource,RESERVE)){
-                        print("2-");
+                       
                         $apiView->render(Reserve::post($urlSegments));
                   }
     break;

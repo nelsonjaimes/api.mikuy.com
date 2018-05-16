@@ -17,7 +17,6 @@ require_once 'utils/Helper.php';
                 return self::signIn();
                 break;
             case SIGN_UP: 
-                printf("iniciando signUp"."\n");
                 return self::signUp(); 
                 break;    
             default: 
@@ -31,7 +30,6 @@ require_once 'utils/Helper.php';
   
     private static function signUp(){
         $decodedParameters = self::getDecodedParameters();
-         printf("preparando objectFields "."\n");
         $objectFields= array("email","name","lastname","gender","password");
          if (!self::isValidateFields($objectFields,$decodedParameters)){
             throw new ApiException(
@@ -42,7 +40,6 @@ require_once 'utils/Helper.php';
                 "El atributo \"id\" o \"password\" o ambos, están vacíos o no definidos"
             );
         }
-         printf("pasando objectFields "."\n");
         $email = $decodedParameters[$objectFields[0]];
         $name =  $decodedParameters[$objectFields[1]];
         $lastname=$decodedParameters[$objectFields[2]];
@@ -57,13 +54,10 @@ require_once 'utils/Helper.php';
                     "http://localhost",
                     "Hubo un error al inicar sesion, datos incorrectos");
          } 
-        printf("entrando a sendRegisterUser"."\n");
         $state=self::sendRegisterUser($email, $name,$lastname,$gender,$password);
-         printf("paso sendRegisterUser"."\n");
-        printf("estate:".$state);
         if ($state) {
             $userData=self::sendAuthenticationUser($email, $password);
-            return[ "status"=>"ok", 
+            return[ "status"=>200, 
                     "name" => $userData["name"],
                     "lastname"=>$userData["lastname"],
                     "email"=>$userData["email"],
@@ -140,7 +134,6 @@ require_once 'utils/Helper.php';
     /*Verification instance objects*/
     private static function isValidateFields($objectFields, $decodedParameters){
     	for ($i=0; $i <count($objectFields); $i++) { 
-            printf($objectFields[$i]);
    			if(!isset($decodedParameters[$objectFields[$i]])){
    				return false;
    			}
