@@ -2,9 +2,6 @@
 require 'views/XmlView.php';
 require 'views/JsonView.php';
 require 'utils/ApiException.php';
-require 'controllers/categorias.php';
-require 'controllers/comanda.php';
-require 'controllers/preliquidacion.php';
 require 'controllers/User.php';
 require 'controllers/Reserve.php';
 require 'controllers/Plates.php';

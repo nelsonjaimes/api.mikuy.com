@@ -40,11 +40,56 @@ class Reserve{
                 "El atributo \"id\" o \"password\" o ambos, están vacíos o no definidos"
             );
         }
-
         $emailUser =  $decodedParameters[$objectFields[0]];
         self::changeStateReservation($emailUser);
+        try{
+        	$pdo = MysqlManager::get()->getDb();
+	 	    $consulta = "SELECT * FROM tbl_reserve WHERE emailuser=?";
+		    $preparedSentence = $pdo->prepare($consulta);
+		    $preparedSentence->bindParam(1,$emailUser); 
+		    $preparedSentence->execute();
+		    $lsReservation = $preparedSentence->fetchAll(PDO::FETCH_ASSOC);
+		    $array = array();	
+
+            foreach ($lsReservation as $reservation) {
+                    $array2=array(
+                    "codereserve"=> $reservation['codereserve'],
+                    "datehour"=> $reservation['datehour'],
+                    "amount" => $reservation['amount'],
+                    "state"=> $reservation['state'],
+                    "unix"=> $reservation['unix'],
+                    "plateList"=>self::detailReservation($reservation['codereserve']));    
+                     $array[] = $array2;   
+                }
+			return $array;   
+        }catch(PDOException $e){
+					throw new ApiException(
+                    "error",50001,
+                    "No se pudo acceder las reservaciones, error de servidor.",
+                    "http://localhost",
+                    "Hubo un error ejecutando una sentencia SQL en la base de datos/Reservation:".
+                     $e->getMessage());	
+        }
     }
     
+    private static function  detailReservation($codeReserve){
+    	try{
+    		$pdo = MysqlManager::get()->getDb();
+	 	    $consulta = "SELECT * FROM tbl_detail_reserve WHERE code_reserve=?";
+	 	    $preparedSentence = $pdo->prepare($consulta);
+		    $preparedSentence->bindParam(1,$codeReserve); 
+		    $preparedSentence->execute();
+		    return $preparedSentence->fetchAll(PDO::FETCH_ASSOC);	
+		}catch(PDOException $e){
+			throw new ApiException(
+                    "error",50001,
+                    "No se pudo acceder al detalle de reservaciones, error de servidor.",
+                    "http://localhost",
+                    "Hubo un error ejecutando una sentencia SQL en la base de datos/Reservation:".
+                     $e->getMessage());	
+		}
+    }
+
     private static function changeStateReservation($emailUser){
 	    try{
 	    	$pdo = MysqlManager::get()->getDb();
