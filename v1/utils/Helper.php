@@ -6,6 +6,7 @@
  //Plate
  define("PLATES", "plates");
  define("PLATES_LIST", "list");
+ define("PLATES_ADD", "addplate");
  /*Reserve*/
  define("RESERVE", "reserve");
  define("MAKE", "make");

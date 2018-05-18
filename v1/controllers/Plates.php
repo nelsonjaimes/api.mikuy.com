@@ -22,6 +22,7 @@ class Plates {
                     "http://localhost", "No se encontró el segmento Plates/".$urlSegments[0]);
         }
     }
+
      private static function getPlatesList(){
         $pdo=MysqlManager::get()->getDb(); 
         $consulta = "SELECT code,name,price,category FROM tbl_plates";

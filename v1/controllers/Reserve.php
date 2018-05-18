@@ -1,12 +1,13 @@
 <?php 
 require_once 'utils/Helper.php';
 require_once 'data/MysqlManager.php';
+
 date_default_timezone_set('America/Lima');
 class Reserve{
 	public static function post($urlSegments) {
             if (!isset($urlSegments[0])) {
             throw new ApiException(
-                "error",40001,
+                 400,0,
                 "El recurso está mal referenciado",
                 "http://localhost",
                 "El recurso $_SERVER[REQUEST_URI] no esta sujeto a resultados");
@@ -20,7 +21,7 @@ class Reserve{
               break; 
             default:
                throw new ApiException(
-                    "error",40001,
+                     400,0,
                     "El recurso al que intentas acceder no existe",
                     "http://localhost", 
                     "No se encontró el segmento Plates/".$urlSegments[0]);
@@ -32,7 +33,7 @@ class Reserve{
     	 $objectFields= array("email");
     	  if (!self::isValidateFields($objectFields,$decodedParameters)){
             throw new ApiException(
-                "error",40001,
+                400,0,
                 "Las credenciales del usuario deben estar definidas correctamente",
                 "http://localhost",
                 "El atributo \"id\" o \"password\" o ambos, están vacíos o no definidos"
@@ -53,15 +54,18 @@ class Reserve{
                     $array2=array(
                     "codereserve"=> $reservation['codereserve'],
                     "datehour"=> $reservation['datehour'],
-                    "amount" => $reservation['amount'],
-                    "state"=> $reservation['state'],
+                    "amount" => (float)$reservation['amount'],
+                    "state"=> (int)$reservation['state'],
                     "plateList"=>self::detailReservation($reservation['codereserve']));    
                      $array[] = $array2;   
                 }
-			return $array;   
+
+			return [ "status" => 200,
+               "reservationlist" => $array
+              ];   
         }catch(PDOException $e){
 					throw new ApiException(
-                    400,50001,
+                     400,0,
                     "No se pudo acceder las reservaciones, error de servidor.",
                     "http://localhost",
                     "Hubo un error ejecutando una sentencia SQL en la base de datos/Reservation:".
@@ -79,7 +83,7 @@ class Reserve{
 		    return $preparedSentence->fetchAll(PDO::FETCH_ASSOC);	
 		}catch(PDOException $e){
 			throw new ApiException(
-                    "error",50001,
+                   400,0,
                     "No se pudo acceder al detalle de reservaciones, error de servidor.",
                     "http://localhost",
                     "Hubo un error ejecutando una sentencia SQL en la base de datos/Reservation:".
@@ -113,7 +117,7 @@ class Reserve{
 			}
 	    }catch(PDOException $e){
 	    	  throw new ApiException(
-	                    "error",50001,
+	                    400,0,
 	                    "No se puedo acceder a los estados de reservaciones, error de servidor.",
 	                    "http://localhost",
 	                    "Hubo un error ejecutando una sentencia SQL en la base de datos/Reservation:".
@@ -133,7 +137,7 @@ class Reserve{
         $objectFields= array("emailuser","amount","platesList");
          if (!self::isValidateFields($objectFields,$decodedParameters)){
             throw new ApiException(
-                "error",40001,
+                 400,0,
                 "Las credenciales del usuario deben estar definidas correctamente",
                 "http://localhost",
                 "El atributo \"id\" o \"password\" o ambos, están vacíos o no definidos"
@@ -146,13 +150,14 @@ class Reserve{
         $datehour = date("d/m/y g:i a");
         $resultConfirmate= self::sendReservationDb($codeReserve,$emailUser,$datehour,$amount,$platesList);
         if ($resultConfirmate) {
-        	return[ "status"=>"ok", 
+        	return[ "status"=> 200, 
                     "message" => "Se realizó la reservatión correctamente",
                     "code_reserve"=>$codeReserve,
                     "amount"=>$amount,
                     "date_hour"=>$datehour	
                   ];
         }
+
     }
 	private static function sendReservationDb($codeReserve,$emailUser,$datehour,$amount,$platesList){
 		try{
@@ -172,7 +177,7 @@ class Reserve{
             return $stateDetailReserve;
           }catch(PDOException $e){
           	  throw new ApiException(
-                    "error",50001,
+                    400,0,
                     "No se pudo realizar la reservación, error de servidor.",
                     "http://localhost",
                     "Hubo un error ejecutando una sentencia SQL en la base de datos/Reservation:".
@@ -194,7 +199,7 @@ class Reserve{
             return true;
 		  }catch(PDOException $e){
 		  	 throw new ApiException(
-		                  "error",50001,
+		                  500,0,
 		                  "No se pudo realizar la reservación,error de servidor",
 		                  "http://localhost",
 		                  "Hubo un error ejecutando una sentencia SQL /tbl DetailReservation:".
@@ -206,7 +211,7 @@ class Reserve{
         $decodedParameters = json_decode($parameters, true);
         if (json_last_error() != JSON_ERROR_NONE) {
             $internalServerError = new ApiException(
-                "error",50001,
+                500,0,
                 "Error interno en el servidor,Contacte al administrador",
                 "http://localhost",
                 "Error de parsing JSON. Causa:" . json_last_error_msg());
@@ -227,7 +232,7 @@ class Reserve{
      		return $newCode;
      		}catch(PDOException $e){
 		  	 throw new ApiException(
-		           "error",50001,
+		            500,0,
 		            "No se pudo generar un codigo de reservación,error de servidor",
 		            "http://localhost",
 		            "Hubo un error ejecutando una sentencia SQL /tbl DetailReservation:".
