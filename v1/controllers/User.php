@@ -21,8 +21,7 @@ require_once 'utils/Helper.php';
                 break;    
             default: 
                 throw new ApiException(
-                    404,
-                    0,
+                    404,0,
                     "El recurso al que intentas acceder no existe",
                     "http://localhost", "No se encontró el segmento \"usuarios/$urlSegments[0]\".");
         }
@@ -33,8 +32,7 @@ require_once 'utils/Helper.php';
         $objectFields= array("email","name","lastname","gender","password");
          if (!self::isValidateFields($objectFields,$decodedParameters)){
             throw new ApiException(
-                400,
-                0,
+                400,0,
                 "Las credenciales del usuario deben estar definidas correctamente",
                 "http://localhost",
                 "El atributo \"id\" o \"password\" o ambos, están vacíos o no definidos"
@@ -48,8 +46,7 @@ require_once 'utils/Helper.php';
         $verifyData= self::verifyExitsUser($email);
         if ($verifyData!=null) {
                 throw new ApiException(
-                    "error" ,
-                    400004,
+                    400, 0,
                     "El correo ya esta asociada a una cuenta,pruebe con otra",
                     "http://localhost",
                     "Hubo un error al inicar sesion, datos incorrectos");
@@ -66,8 +63,7 @@ require_once 'utils/Helper.php';
                   ];
          }else{
                throw new ApiException(
-                    "error" ,
-                    500001,
+                    400, 0,
                     "Error de servidor ,no se pudo registrar la cuenta",
                     "http://localhost",
                     "Hubo un error ejecutando el registro de usuario en la base de datos");
@@ -96,8 +92,7 @@ require_once 'utils/Helper.php';
         $decodedParameters = json_decode($parameters, true);
         if (json_last_error() != JSON_ERROR_NONE) {
             $internalServerError = new ApiException(
-                500,
-                0,
+                500, 0,
                 "Error interno en el servidor. Contacte al administrador",
                 "http://localhost",
                 "Error de parsing JSON. Causa:" . json_last_error_msg());
@@ -121,12 +116,12 @@ require_once 'utils/Helper.php';
 		$email = $decodedParameters[$objectFields[0]];
     	$password =$decodedParameters[$objectFields[1]];
         $userData=self::sendAuthenticationUser($email, $password);
-        return   [  "status"=>"ok", 
+        return   [  "status" => 200, 
                     "name" => $userData["name"],
-                    "lastname"=>$userData["lastname"],
-                    "email"=>$userData["email"],
-                    "gender"=>$userData["gender"],
-                    "token"=>$userData["token"]
+                    "lastname" => $userData["lastname"],
+                    "email" => $userData["email"],
+                    "gender" => $userData["gender"],
+                    "token" => $userData["token"]
                   ];
         
     }
@@ -148,17 +143,15 @@ require_once 'utils/Helper.php';
                     return $userData;
                 } else {
                     throw new ApiException(
-                    "error" ,
-                    400001,
+                    400, 0,
                     "Contraseña incorrecta, vuelve a ingresar los datos",
                     "http://localhost",
                     "Hubo un error al inicar sesion, datos incorrectos");
                 } 
             }else{
                 throw new ApiException(
-                    "error",
-                    400003,
-                    "Usuario no registrado,registre una cuenta para poder ingresar",
+                    400, 0,
+                    "Usuario no registrado, registrese para poder ingresar",
                     "http://localhost",
                     "Hubo un error ejecutando una sentencia SQL en Authentication");
              }
@@ -166,14 +159,13 @@ require_once 'utils/Helper.php';
      private static function verifyExitsUser($email){
             $pdo = MysqlManager::get()->getDb();
             $sentence = "SELECT * FROM tbl_user WHERE email=?";
-            $preparedSentence = $pdo->prepare($sentence);
-            $preparedSentence->bindParam(1, $email);
-            if ($preparedSentence->execute()) {
-                return $preparedSentence->fetch(PDO::FETCH_ASSOC);
+            $preparedSentence = $pdo -> prepare($sentence);
+            $preparedSentence -> bindParam(1, $email);
+            if ($preparedSentence -> execute()) {
+                return $preparedSentence -> fetch(PDO::FETCH_ASSOC);
             }else{
                  throw new ApiException(
-                    "error" ,
-                    500001,
+                    500, 0,
                     "Error de base de datos en el servidor",
                     "http://localhost",
                     "Hubo un error ejecutando una sentencia SQL en la base de datos. verifyExitsUser:".

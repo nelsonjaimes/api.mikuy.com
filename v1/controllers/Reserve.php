@@ -4,7 +4,6 @@ require_once 'data/MysqlManager.php';
 date_default_timezone_set('America/Lima');
 class Reserve{
 	public static function post($urlSegments) {
-		print("3-");
             if (!isset($urlSegments[0])) {
             throw new ApiException(
                 "error",40001,
@@ -17,7 +16,6 @@ class Reserve{
             case MAKE: return self::makeServation();
               break;
             case LIST_RESERVATION: 
-  			printf("entro...");
             return self::getListReservation();  
               break; 
             default:
@@ -57,14 +55,13 @@ class Reserve{
                     "datehour"=> $reservation['datehour'],
                     "amount" => $reservation['amount'],
                     "state"=> $reservation['state'],
-                    "unix"=> $reservation['unix'],
                     "plateList"=>self::detailReservation($reservation['codereserve']));    
                      $array[] = $array2;   
                 }
 			return $array;   
         }catch(PDOException $e){
 					throw new ApiException(
-                    "error",50001,
+                    400,50001,
                     "No se pudo acceder las reservaciones, error de servidor.",
                     "http://localhost",
                     "Hubo un error ejecutando una sentencia SQL en la base de datos/Reservation:".
@@ -125,17 +122,14 @@ class Reserve{
     }
 
     private static function isExpireReservation($unix,$currentUnix){
-        printf("\npre_4\n");
     	$diference = $currentUnix - $unix;
   		$diference = $diference/60;
-  		printf("\nminutes:".$diference."\n");
   		if ($diference > TIME_MAX_RESERVATION) return true;
   		return false;		
     }		
 
     private static function makeServation(){
     	$decodedParameters = self::getDecodedParameters();
-        print("5-");
         $objectFields= array("emailuser","amount","platesList");
          if (!self::isValidateFields($objectFields,$decodedParameters)){
             throw new ApiException(
@@ -145,9 +139,7 @@ class Reserve{
                 "El atributo \"id\" o \"password\" o ambos, están vacíos o no definidos"
             );
         }
-        print("6-");
         $codeReserve = self::generateCodeReserve();
-        printf("genera:".$codeReserve);
         $emailUser =  $decodedParameters[$objectFields[0]];
         $amount = $decodedParameters[$objectFields[1]];
         $platesList = $decodedParameters[$objectFields[2]];
@@ -190,10 +182,8 @@ class Reserve{
 
      private static function sendDatailReservationDb($platesList, $codeReserve){
          try{
-         	printf("send7_");
      		$pdo = MysqlManager::get()->getDb();
             $sentence = "INSERT INTO tbl_detail_reserve(code_reserve,code_plate,count_plate) VALUES (?,?,?)";
-            printf("send8_");
             $preparedStament = $pdo->prepare($sentence); 
             foreach ($platesList as $plate) {
             		$preparedStament->bindParam(1,$codeReserve);
@@ -201,7 +191,6 @@ class Reserve{
 		            $preparedStament->bindParam(3,$plate['acount']);
 		            $preparedStament->execute();
             }
-            printf("send9_");
             return true;
 		  }catch(PDOException $e){
 		  	 throw new ApiException(
@@ -228,7 +217,6 @@ class Reserve{
 
        private static function generateCodeReserve(){
        	try{
-       		printf("7");
      		$pdo = MysqlManager::get()->getDb();
      		$sentence = "SELECT COUNT(*) as num FROM tbl_reserve";	
      		$preparedSentence = $pdo->prepare($sentence); 
@@ -236,7 +224,6 @@ class Reserve{
      		$rows = $preparedSentence->fetch(PDO::FETCH_ASSOC);
      		$newCode = (int) $rows["num"]+1;
      		$newCode ="R".$newCode;
-     		printf("code:".$newCode);
      		return $newCode;
      		}catch(PDOException $e){
 		  	 throw new ApiException(
@@ -251,7 +238,6 @@ class Reserve{
 
         private static function isValidateFields($objectFields, $decodedParameters){
     	for ($i=0; $i <count($objectFields); $i++) { 
-            printf($objectFields[$i]);
    			if(!isset($decodedParameters[$objectFields[$i]])){
    				return false;
    			}

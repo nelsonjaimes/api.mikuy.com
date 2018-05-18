@@ -27,12 +27,22 @@ class Plates {
         $consulta = "SELECT code,name,price,category FROM tbl_plates";
         $preparedSentence = $pdo->prepare($consulta);
         if($preparedSentence->execute()){
-            return$preparedSentence->fetchAll(PDO::FETCH_ASSOC); 
+            $platesList = $preparedSentence->fetchAll(PDO::FETCH_ASSOC); 
+             $array= array();
+               foreach ($platesList as $plate) {
+                  $array2= array( "code" => $plate['code'],
+                                  "name" => $plate['name'],
+                                  "price" => (float)$plate['price'],
+                                  "category" => $plate['category']);
+                  $array[]=$array2;
+                }
+              return[ "status"=>200,
+                       "platelist"=>$array];
            } else {
                 throw new ApiException(
                     500,
                     0,
-                    "Error de base de datos en el servidor",
+                    "No se puedo descargar la lista de platos ,error de servidor.",
                     "http://localhost",
                     "Hubo un error ejecutando una sentencia SQL en la base de datos. Detalles:" .
                      $pdo->errorInfo()[2]
